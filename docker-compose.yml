@@ -1,0 +1,40 @@
+version: '3'
+services:
+  # Backend Service (Server)
+  server:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./server:/app
+      - ./server/uploads:/app/uploads
+    ports:
+      - '5000:5000'
+    environment:
+      - NODE_ENV=development
+      - MONGO_URI=mongodb://mongo:27017/mydb  # MongoDB service URI
+    depends_on:
+      - mongo  # Ensure MongoDB starts before the server
+    command: bash -c "npm install && node index.js"
+
+  # Frontend Service (Client)
+  client:
+    image: node:18
+    working_dir: /app
+    volumes:
+      - ./client:/app
+    ports:
+      - '3000:3000'
+    environment:
+      - NODE_ENV=development
+    command: bash -c "npm install && npm run dev"
+
+  # MongoDB Service
+  mongo:
+    image: mongo:6
+    ports:
+      - "27017:27017"  # Expose MongoDB port
+    volumes:
+      - mongo-data:/data/db  # Persist MongoDB data
+
+volumes:
+  mongo-data:
